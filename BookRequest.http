@@ -1,0 +1,15 @@
+PUT http://localhost:8080/books/update
+Content-Type: application/json
+
+{
+  "id": 1,
+  "isbn": "100",
+  "title": "testTitle100",
+  "author": "testAuthor100",
+  "publisher": "testPublisher100",
+  "type": "testType100"
+}
+
+
+
+
