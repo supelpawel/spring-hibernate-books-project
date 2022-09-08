@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="spring-project" />
         <module name="spring-hibernate-project" />
+        <module name="spring-hibernate-books-project" />
       </profile>
     </annotationProcessing>
   </component>
