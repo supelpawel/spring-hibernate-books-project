@@ -25,42 +25,39 @@ import java.util.Locale;
 @EnableJpaRepositories(basePackages = "pl.coderslab.repository")
 public class AppConfig implements WebMvcConfigurer {
 
-    @Bean
-    public LocalEntityManagerFactoryBean entityManagerFactory() {
+  @Bean
+  public LocalEntityManagerFactoryBean entityManagerFactory() {
+    LocalEntityManagerFactoryBean emfb = new LocalEntityManagerFactoryBean();
 
-        LocalEntityManagerFactoryBean emfb = new LocalEntityManagerFactoryBean();
-        emfb.setPersistenceUnitName("workshopHibernate");
+    emfb.setPersistenceUnitName("workshopHibernate");
+    return emfb;
+  }
 
-        return emfb;
-    }
+  @Bean
+  public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
+    return new JpaTransactionManager(emf);
+  }
 
-    @Bean
-    public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
-        return new JpaTransactionManager(emf);
-    }
+  @Bean
+  public ViewResolver viewResolver() {
+    InternalResourceViewResolver viewResolver =
+        new InternalResourceViewResolver();
 
-    @Bean
-    public ViewResolver viewResolver() {
+    viewResolver.setPrefix("/WEB-INF/views/");
+    viewResolver.setSuffix(".jsp");
+    return viewResolver;
+  }
 
-        InternalResourceViewResolver viewResolver =
-                new InternalResourceViewResolver();
-        viewResolver.setPrefix("/WEB-INF/views/");
-        viewResolver.setSuffix(".jsp");
+  @Override
+  public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+    configurer.enable();
+  }
 
-        return viewResolver;
-    }
+  @Bean(name = "localeResolver")
+  public LocaleContextResolver getLocaleContextResolver() {
+    SessionLocaleResolver localeResolver = new SessionLocaleResolver();
 
-    @Override
-    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-        configurer.enable();
-    }
-
-    @Bean(name = "localeResolver")
-    public LocaleContextResolver getLocaleContextResolver() {
-
-        SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-        localeResolver.setDefaultLocale(new Locale("pl", "PL"));
-
-        return localeResolver;
-    }
+    localeResolver.setDefaultLocale(new Locale("pl", "PL"));
+    return localeResolver;
+  }
 }

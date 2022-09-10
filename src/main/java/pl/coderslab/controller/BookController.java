@@ -19,86 +19,74 @@ import java.util.Optional;
 @RequestMapping(path = "/books")
 public class BookController {
 
-    private final BookService bookService;
+  private final BookService bookService;
 
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
+  public BookController(BookService bookService) {
+    this.bookService = bookService;
+  }
+
+  @GetMapping(path = "/all")
+  public String showBooks(Model model) {
+    List<Book> books = bookService.findAll();
+
+    model.addAttribute("books", books);
+    return "book/all";
+  }
+
+  @GetMapping(path = "/add")
+  public String showAddForm(Model model) {
+    Book book = new Book();
+
+    model.addAttribute("book", book);
+    return "book/add";
+  }
+
+  @PostMapping(path = "/add")
+  public String saveBook(@Valid Book book, BindingResult result) {
+    if (result.hasErrors()) {
+      return "book/add";
     }
 
-    @GetMapping(path = "/all")
-    public String showBooks(Model model) {
+    bookService.add(book);
+    return "redirect:/books/all";
+  }
 
-        List<Book> books = bookService.findAll();
-        model.addAttribute("books", books);
+  @GetMapping(path = "/edit/{id}")
+  public String showEditForm(@PathVariable long id, Model model) {
+    Optional<Book> bookToEdit = bookService.get(id);
 
-        return "book/all";
+    if (bookToEdit.isPresent()) {
+      Book book = bookToEdit.get();
+      model.addAttribute("book", book);
+    }
+    return "book/edit";
+  }
+
+  @PostMapping(path = "/edit")
+  public String editBook(@Valid Book book, BindingResult result) {
+    if (result.hasErrors()) {
+      return "book/edit";
     }
 
-    @GetMapping(path = "/add")
-    public String showAddForm(Model model) {
+    bookService.update(book);
+    return "redirect:/books/all";
+  }
 
-        Book book = new Book();
-        model.addAttribute("book", book);
+  @GetMapping(path = "/delete/{id}")
+  public String deleteBook(@PathVariable long id) {
+    bookService.delete(id);
+    return "redirect:/books/all";
+  }
 
-        return "book/add";
+  @GetMapping(path = "/show/{id}")
+  public String showBook(@PathVariable long id, Model model) {
+    Optional<Book> bookToShow = Optional.ofNullable(
+        bookService.get(id).orElseThrow(EntityNotFoundException::new));
+
+    if (bookToShow.isPresent()) {
+      Book book = bookToShow.get();
+      model.addAttribute("book", book);
     }
-
-    @PostMapping(path = "/add")
-    public String saveBook(@Valid Book book, BindingResult result) {
-
-        if (result.hasErrors()) {
-            return "book/add";
-        }
-
-        bookService.add(book);
-        return "redirect:/books/all";
-    }
-
-    @GetMapping(path = "/edit/{id}")
-    public String showEditForm(@PathVariable long id, Model model) {
-
-        Optional<Book> bookToEdit = bookService.get(id);
-
-        if (bookToEdit.isPresent()) {
-
-            Book book = bookToEdit.get();
-            model.addAttribute("book", book);
-        }
-
-        return "book/edit";
-    }
-
-    @PostMapping(path = "/edit")
-    public String editBook(@Valid Book book, BindingResult result) {
-
-        if (result.hasErrors()) {
-            return "book/edit";
-        }
-
-        bookService.update(book);
-
-        return "redirect:/books/all";
-    }
-
-    @GetMapping(path = "/delete/{id}")
-    public String deleteBook(@PathVariable long id) {
-
-        bookService.delete(id);
-
-        return "redirect:/books/all";
-    }
-
-    @GetMapping(path = "/show/{id}")
-    public String showBook(@PathVariable long id, Model model) {
-
-        Optional<Book> bookToShow = Optional.ofNullable(bookService.get(id).orElseThrow(EntityNotFoundException::new));
-
-        if (bookToShow.isPresent()) {
-
-            Book book = bookToShow.get();
-            model.addAttribute("book", book);
-        }
-
-        return "book/show";
-    }
+    return "book/show";
+  }
 }
